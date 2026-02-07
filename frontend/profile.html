@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>My Profile</h1>
+  <div id="info"></div>
+
+  <h2>Change Password</h2>
+  <input type="password" id="newPassword" placeholder="New Password">
+  <button id="changePassword">Change</button>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    async function loadProfile() {
+      
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const container = document.getElementById('info');
+      container.innerHTML = `User ID: ${payload.id} <br> Role: ${payload.role}`;
+    }
+
+    document.getElementById('changePassword').addEventListener('click', async () => {
+      const newPassword = document.getElementById('newPassword').value;
+      await fetch(`http://localhost:3000/api/auth/change-password`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization': token },
+        body: JSON.stringify({ password: newPassword })
+      });
+      alert('Password changed!');
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>

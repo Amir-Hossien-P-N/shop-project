@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Admin Panel</h1>
+  <input type="text" id="title" placeholder="Product title">
+  <input type="number" id="price" placeholder="Price">
+  <button id="addProduct">Add Product</button>
+
+  <div id="products"></div>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    async function loadProducts() {
+      const res = await fetch('http://localhost:3000/api/products');
+      const data = await res.json();
+      const container = document.getElementById('products');
+      container.innerHTML = '';
+      data.forEach(p => {
+        const div = document.createElement('div');
+        div.innerHTML = `${p.title} - $${p.price} <button onclick="deleteProduct(${p.id})">Delete</button>`;
+        container.appendChild(div);
+      });
+    }
+
+    async function deleteProduct(id) {
+      await fetch(`http://localhost:3000/api/products/${id}`, {
+        method:'DELETE',
+        headers:{ 'Authorization': token }
+      });
+      loadProducts();
+    }
+
+    document.getElementById('addProduct').addEventListener('click', async () => {
+      const title = document.getElementById('title').value;
+      const price = document.getElementById('price').value;
+      await fetch('http://localhost:3000/api/products', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization': token },
+        body: JSON.stringify({ title, price })
+      });
+      loadProducts();
+    });
+
+    loadProducts();
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Search Products</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Search Products</h1>
+  <input type="text" id="key" placeholder="Type to search...">
+  <div id="results"></div>
+
+  <script>
+    const keyInput = document.getElementById('key');
+    const resultsDiv = document.getElementById('results');
+
+    keyInput.addEventListener('input', async () => {
+      const key = keyInput.value;
+      const res = await fetch(`http://localhost:3000/api/products/search/${key}`);
+      const data = await res.json();
+      resultsDiv.innerHTML = '';
+      data.forEach(p => {
+        const div = document.createElement('div');
+        div.textContent = p.title;
+        resultsDiv.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>

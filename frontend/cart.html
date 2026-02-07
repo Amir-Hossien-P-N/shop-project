@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shop - Cart</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a href="index.html">Products</a> |
+    <a href="cart.html">Cart</a> |
+    <a href="login.html">Login</a> |
+    <a href="register.html">Register</a> |
+    <a href="admin.html">Admin</a>
+  </nav>
+
+  <h1>Cart</h1>
+  <div id="cart"></div>
+  <button id="pay">Fake Pay</button>
+
+  <script>
+    async function loadCart() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const container = document.getElementById('cart');
+      container.innerHTML = '';
+      cart.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.innerHTML = `${item.title} - $${item.price} <button onclick="removeItem(${i})">X</button>`;
+        container.appendChild(div);
+      });
+    }
+
+    function removeItem(index) {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      loadCart();
+    }
+
+    document.getElementById('pay').addEventListener('click', async () => {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const total_price = cart.reduce((sum, i) => sum + i.price, 0);
+      const token = localStorage.getItem('token');
+      await fetch('http://localhost:3000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization': token },
+        body: JSON.stringify({ total_price })
+      });
+      localStorage.setItem('cart', '[]');
+      loadCart();
+      alert('Paid');
+    });
+
+    loadCart();
+  </script>
+</body>
+</html>
